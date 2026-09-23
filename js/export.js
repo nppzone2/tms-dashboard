@@ -1,0 +1,1 @@
+function exportCSV(rows,name){if(!rows.length)return;const c=Object.keys(rows[0]),q=v=>'"'+String(v??'').replaceAll('"','""')+'"',s=c.join(',')+'\n'+rows.map(r=>c.map(k=>q(r[k])).join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download=name;a.click()}
