@@ -132,21 +132,17 @@ async function initDashboard() {
             x => x.TenantName === sess.tenant
         );
 
-
         errors = errors.filter(
             x => x.TenantName === sess.tenant
         );
-
 
         plans = plans.filter(
             x => x.TenantName === sess.tenant
         );
 
-
         audit = audit.filter(
             x => x.TenantName === sess.tenant
         );
-
 
         summary = summary.filter(
             x => x.TenantName === sess.tenant
@@ -255,9 +251,7 @@ document
                     x.classList.remove("active")
                 );
 
-
             button.classList.add("active");
-
 
             render(
                 button.dataset.page
@@ -379,7 +373,12 @@ function render(page) {
             rows.length;
 
 
+        /* -----------------------------------------------
+           KPI Summary
+           ----------------------------------------------- */
+
         const compliance24 =
+            s["24H Compliance"] ??
             s["24H_Compliance"] ??
             s.Compliance24H ??
             s["24H"] ??
@@ -387,12 +386,14 @@ function render(page) {
 
 
         const geo =
+            s["Geo Compliance"] ??
             s.Geo_Compliance ??
             s.GEO ??
             "N/A";
 
 
         const payload =
+            s["Payload Compliance"] ??
             s.Payload_Compliance ??
             s.Payload ??
             "N/A";
@@ -541,28 +542,24 @@ function render(page) {
                     OrderNumber:
                         x.OrderNumber,
 
-
                     "24H":
                         x["24H"] ??
-                        x.r24 ??
+                        x["24H_Result"] ??
                         "",
-
 
                     GEO:
                         x.GEO ??
-                        x.geo ??
+                        x["Geo_Result"] ??
                         "",
-
 
                     Payload:
                         x.Payload ??
-                        x.payload ??
+                        x["Payload_Result"] ??
                         "",
-
 
                     Duration:
                         x.Duration ??
-                        x.duration ??
+                        x["24H_Duration_Hours"] ??
                         ""
 
                 }))
@@ -596,10 +593,8 @@ function render(page) {
                     OrderNumber:
                         x.OrderNumber,
 
-
                     PlanNumber:
                         x.PlanNumber,
-
 
                     Reason:
                         x.Reason ??
