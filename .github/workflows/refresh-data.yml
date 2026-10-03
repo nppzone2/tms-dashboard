@@ -39,8 +39,8 @@ jobs:
           git config user.name "TMS Dashboard Bot"
           git config user.email "actions@github.com"
 
-          git add data/
-
+          git add data/ validation/
+          
           if git diff --cached --quiet; then
             echo "No data changes."
           else
