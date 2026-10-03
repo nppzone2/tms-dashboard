@@ -5,6 +5,8 @@ on:
     paths:
       - 'input/TMS Order Detail.xlsx'
       - 'input/Fill Rate.xlsx'
+      - 'engine/refresh_engine.py'
+      - '.github/workflows/refresh-data.yml'
 
   workflow_dispatch:
 
