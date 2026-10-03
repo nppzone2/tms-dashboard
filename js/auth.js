@@ -57,6 +57,9 @@ const USERS = [
 
 function login(username, password) {
 
+    username = username.trim();
+    password = password.trim();
+
     const user = USERS.find(
         u =>
             u.username === username &&
@@ -78,3 +81,43 @@ function login(username, password) {
 
     return true;
 }
+
+
+// =========================
+// LOGIN FORM
+// =========================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("loginForm");
+
+    if (!form) {
+        console.error("Login form not found");
+        return;
+    }
+
+    form.addEventListener("submit", function (event) {
+
+        // Quan trọng:
+        // Cho phép Enter trong Username/Password
+        event.preventDefault();
+
+        const username =
+            document.getElementById("username").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+        const success = login(username, password);
+
+        if (!success) {
+
+            alert("Invalid username or password");
+
+            return;
+        }
+
+        window.location.href = "index.html";
+    });
+
+});
