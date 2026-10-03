@@ -53,9 +53,9 @@ PAYLOAD_MAX_RATIO = 1.5
 PLAN_ERROR_THRESHOLD = 0.30
 
 # Approved username formats used by the current TMS source.
-PHONE_RE = re.compile(r"^\d{10}$")
-VEHICLE_RE = re.compile(r"^\d{2}[A-Za-z]\d{5}$")
-DSA_RE = re.compile(r"^P\d+DSA(?:S\d+)?$", re.IGNORECASE)
+PHONE_RE = re.compile(r"^0\d{9}$")
+VEHICLE_RE = re.compile(r"^\d{2}[A-Za-z]{1,2}-?\d{4,6}$", re.IGNORECASE)
+DSA_RE = re.compile(r"^(.+)DSAs\d$", re.IGNORECASE)
 
 OUTPUT_FILES = [
     "npp_summary.json",
@@ -253,15 +253,13 @@ def build_engine() -> dict[str, Any]:
     username = d["username"].fillna("").astype(str).str.strip()
     phone = username.str.fullmatch(PHONE_RE)
     vehicle = username.str.fullmatch(VEHICLE_RE)
-    dsa = username.str.fullmatch(DSA_RE)
+    dsa_match = username.str.extract(DSA_RE, expand=False)
+    tenant = d["TenantName"].fillna("").astype(str).str.strip()
+    dsa = dsa_match.notna() & dsa_match.str.upper().eq(tenant.str.upper())
     username_valid = phone | vehicle | dsa
-    d["UserName Check"] = np.select(
-        [username.eq(""), username_valid],
-        ["N/A", "Pass"],
-        default="Wrong",
-    )
+    d["UserName Check"] = np.select([username.eq(""), username_valid], ["N/A", "Pass"], default="Wrong")
     d["DSA Excluded"] = dsa.fillna(False)
-
+  
     # ------------------------------------------------------------------
     # Created Time
     # ------------------------------------------------------------------
