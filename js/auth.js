@@ -1,3 +1,56 @@
-// Demo only. Production authentication will be replaced later.
-const users={NPP001:{password:'demo123',npp:'NPP001'},NPP002:{password:'demo123',npp:'NPP002'}};
-go.onclick=()=>{const u=document.getElementById('u').value.trim().toUpperCase(),p=document.getElementById('p').value;if(!users[u]||users[u].password!==p){msg.textContent='Invalid username or password';return}sessionStorage.tmsUser=JSON.stringify({user:u,npp:users[u].npp});location='index.html'};
+const USERS = [
+    {
+        username: "10260142",
+        password: "demo123",
+        tenant: "P444",
+        role: "NPP"
+    },
+    {
+        username: "10260145",
+        password: "demo123",
+        tenant: "P461",
+        role: "NPP"
+    },
+    {
+        username: "10349819",
+        password: "demo123",
+        tenant: "P467",
+        role: "NPP"
+    },
+    {
+        username: "10260143",
+        password: "demo123",
+        tenant: "P449",
+        role: "NPP"
+    },
+    {
+        username: "10419898",
+        password: "demo123",
+        tenant: "P468",
+        role: "NPP"
+    },
+    {
+        username: "10260126",
+        password: "demo123",
+        tenant: "P450",
+        role: "NPP"
+    },
+    {
+        username: "10260129",
+        password: "demo123",
+        tenant: "P69",
+        role: "NPP"
+    },
+    {
+        username: "10446954",
+        password: "demo123",
+        tenant: "HM12",
+        role: "NPP"
+    },
+    {
+        username: "10260147",
+        password: "demo123",
+        tenant: "HM",
+        role: "NPP"
+    }
+];
