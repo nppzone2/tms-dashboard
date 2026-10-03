@@ -5,7 +5,7 @@ if (!sess) {
 }
 
 document.getElementById('user').textContent =
-    'NPP: ' + (sess?.npp || '-');
+    'NPP: ' + (sess?.tenant || '-');
 
 let rows = [];
 let errors = [];
@@ -34,23 +34,23 @@ async function initDashboard() {
          */
 
         rows = rows.filter(
-            x => x.NPPCode === sess.npp
+            x => x.TenantName === sess.tenant
         );
 
         errors = errors.filter(
-            x => x.NPPCode === sess.npp
+            x => x.TenantName === sess.tenant
         );
 
         plans = plans.filter(
-            x => x.NPPCode === sess.npp
+            x => x.TenantName === sess.tenant
         );
 
         audit = audit.filter(
-            x => x.NPPCode === sess.npp
+            x => x.TenantName === sess.tenant
         );
-
+        
         summary = summary.filter(
-            x => x.NPPCode === sess.npp
+            x => x.TenantName === sess.tenant
         );
 
         console.log(
@@ -58,8 +58,8 @@ async function initDashboard() {
         );
 
         console.log(
-            'NPP:',
-            sess.npp
+        'NPP:',
+        sess.tenant
         );
 
         console.log(
