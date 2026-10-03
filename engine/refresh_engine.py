@@ -250,15 +250,19 @@ def build_engine() -> dict[str, Any]:
     # ------------------------------------------------------------------
     # Username
     # ------------------------------------------------------------------
-    username = d["username"].fillna("").astype(str).str.strip()
-    phone = username.str.fullmatch(PHONE_RE)
-    vehicle = username.str.fullmatch(VEHICLE_RE)
-    dsa_match = username.str.extract(DSA_RE, expand=False)
-    tenant = d["TenantName"].fillna("").astype(str).str.strip()
-    dsa = dsa_match.notna() & dsa_match.str.upper().eq(tenant.str.upper())
-    username_valid = phone | vehicle | dsa
-    d["UserName Check"] = np.select([username.eq(""), username_valid], ["N/A", "Pass"], default="Wrong")
-    d["DSA Excluded"] = dsa.fillna(False)
+   # Username
+    username=d["username"].fillna("").astype(str).str.strip().str.upper()
+    phone=username.str.fullmatch(r"0\d{9}")
+    vehicle=username.str.fullmatch(r"\d{2}[A-Z]{1,2}-?\d{4,6}")
+    dsa_match=username.str.extract(r"^(.+)DSAS(\d)$",expand=False)
+    tenant=d["TenantName"].fillna("").astype(str).str.strip().str.upper()
+    dsa=dsa_match.notna()&dsa_match.eq(tenant)
+    username_valid=phone|vehicle|dsa
+    d["UserName Check"]=np.select([username.eq(""),username_valid],["N/A","Pass"],default="Wrong")
+    d["DSA Excluded"]=dsa.fillna(False)
+    d["Username_Debug"]=username
+    d["Username_Type"]=np.select([phone,vehicle,dsa],["Phone","Vehicle","DSA"],default="Invalid")
+
     # ------------------------------------------------------------------
     # Created Time
     # ------------------------------------------------------------------
