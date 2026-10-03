@@ -252,24 +252,22 @@ def build_engine() -> dict[str, Any]:
     # ------------------------------------------------------------------
     username_raw=d["username"].fillna("").astype(str)
     username=(username_raw.str.strip().str.upper()
-          .str.replace("\u00A0"," ",regex=False)
-          .str.replace(r"\s+","",regex=True)
-          .str.replace("–","-",regex=False)
-          .str.replace("—","-",regex=False)
-          .str.replace("−","-",regex=False))
-  
-  phone=username.str.fullmatch(r"0\d{9}")
-  vehicle=username.str.fullmatch(r"\d{2}[A-Z]{1,2}-?\d{4,6}")
-  dsa_match=username.str.extract(r"^(.+)DSAS(\d)$",expand=False)
-  tenant=d["TenantName"].fillna("").astype(str).str.strip().str.upper()
-  dsa=dsa_match.notna()&dsa_match.eq(tenant)
-
-  username_valid=phone|vehicle|dsa
-  d["UserName Check"]=np.select([username.eq(""),username_valid],["N/A","Pass"],default="Wrong")
-  d["DSA Excluded"]=dsa.fillna(False)
-  d["Username_Debug"]=username_raw
-  d["Username_Normalized"]=username
-  d["Username_Type"]=np.select([phone,vehicle,dsa],["Phone","Vehicle","DSA"],default="Invalid")
+              .str.replace("\u00A0","",regex=False)
+              .str.replace(r"\s+","",regex=True)
+              .str.replace("–","-",regex=False)
+              .str.replace("—","-",regex=False)
+              .str.replace("−","-",regex=False))
+    phone=username.str.fullmatch(r"0\d{9}")
+    vehicle=username.str.fullmatch(r"\d{2}[A-Z]{1,2}-?\d{4,6}")
+    dsa_match=username.str.extract(r"^(.+)DSAS(\d)$",expand=False)
+    tenant=d["TenantName"].fillna("").astype(str).str.strip().str.upper()
+    dsa=dsa_match.notna()&dsa_match.eq(tenant)
+    username_valid=phone|vehicle|dsa
+    d["UserName Check"]=np.select([username.eq(""),username_valid],["N/A","Pass"],default="Wrong")
+    d["DSA Excluded"]=dsa.fillna(False)
+    d["Username_Debug"]=username_raw
+    d["Username_Normalized"]=username
+    d["Username_Type"]=np.select([phone,vehicle,dsa],["Phone","Vehicle","DSA"],default="Invalid")
 
     # ------------------------------------------------------------------
     # Created Time
