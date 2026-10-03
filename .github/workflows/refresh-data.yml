@@ -3,7 +3,7 @@ name: Refresh TMS Dashboard Data
 on:
   push:
     paths:
-      - 'input/TMS Detail Order.xlsx'
+      - 'input/TMS Order Detail.xlsx'
       - 'input/Fill Rate.xlsx'
 
   workflow_dispatch:
