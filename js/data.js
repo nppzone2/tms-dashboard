@@ -1,1 +1,61 @@
-async function loadData(){return[{OrderNumber:'O001',PlanNumber:'P001',NPPCode:'NPP001',DriverName:'Driver A',OrderDateTime:'2026-09-22T16:00:00',DeliverDateTime:'2026-09-22T20:00:00',distance_to_dropped:32,time_outlet_outlet:4,Assigned_Weight:4000,TruckCapacityWeight:5000,username:'ok'},{OrderNumber:'O002',PlanNumber:'P001',NPPCode:'NPP001',DriverName:'Driver A',OrderDateTime:'2026-09-22T18:30:00',DeliverDateTime:'2026-09-23T12:00:00',distance_to_dropped:68,time_outlet_outlet:1,Assigned_Weight:4000,TruckCapacityWeight:5000,username:'ok'},{OrderNumber:'O003',PlanNumber:'P002',NPPCode:'NPP002',DriverName:'Driver B',OrderDateTime:'2026-09-22T10:00:00',DeliverDateTime:'2026-09-23T15:00:00',distance_to_dropped:20,time_outlet_outlet:5,Assigned_Weight:8000,TruckCapacityWeight:5000,username:'ok'}]}
+const DATA_PATH = "./data/";
+
+let dashboardData = {
+    nppSummary: [],
+    orderDetail: [],
+    errorDetail: [],
+    planDetail: [],
+    calculationAudit: [],
+    dataQuality: {}
+};
+
+async function loadJSON(fileName) {
+    const response = await fetch(`${DATA_PATH}${fileName}`);
+
+    if (!response.ok) {
+        throw new Error(`Cannot load ${fileName}: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+async function loadDashboardData() {
+    try {
+        const [
+            nppSummary,
+            orderDetail,
+            errorDetail,
+            planDetail,
+            calculationAudit,
+            dataQuality
+        ] = await Promise.all([
+            loadJSON("npp_summary.json"),
+            loadJSON("order_detail.json"),
+            loadJSON("error_detail.json"),
+            loadJSON("plan_detail.json"),
+            loadJSON("calculation_audit.json"),
+            loadJSON("data_quality.json")
+        ]);
+
+        dashboardData = {
+            nppSummary,
+            orderDetail,
+            errorDetail,
+            planDetail,
+            calculationAudit,
+            dataQuality
+        };
+
+        console.log("TMS Dashboard data loaded successfully");
+        console.log("NPP Summary:", nppSummary);
+        console.log("Orders:", orderDetail.length);
+        console.log("Errors:", errorDetail.length);
+        console.log("Plans:", planDetail.length);
+
+        return dashboardData;
+
+    } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+        throw error;
+    }
+}
