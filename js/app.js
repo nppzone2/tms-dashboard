@@ -363,8 +363,10 @@ function render(page) {
     if (page === "overview") {
 
         const s =
-            summary[0] || {};
-
+           summary.find(
+              x =>String(x.TenantName || "").trim() ===
+                 String(sess.tenant || "").trim()
+    ) || {};
 
         const orders =
             s.Orders ??
