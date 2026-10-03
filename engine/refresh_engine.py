@@ -252,16 +252,20 @@ def build_engine() -> dict[str, Any]:
     # ------------------------------------------------------------------
     username_raw=d["username"].fillna("").astype(str)
     username=(username_raw.str.strip().str.upper()
-              .str.replace("\u00A0","",regex=False)
+              .str.replace("\u00A0"," ",regex=False)
               .str.replace(r"\s+","",regex=True)
               .str.replace("–","-",regex=False)
               .str.replace("—","-",regex=False)
               .str.replace("−","-",regex=False))
     phone=username.str.fullmatch(r"0\d{9}")
     vehicle=username.str.fullmatch(r"\d{2}[A-Z]{1,2}-?\d{4,6}")
-    dsa_match=username.str.extract(r"^(.+)DSAS(\d)$",expand=False)
+    # DSA format: <TenantName>DSAS<digit>; capture only the tenant prefix.
+    dsa_match=username.str.extract(r"^(.+)DSAS\d$",expand=False)
     tenant=d["TenantName"].fillna("").astype(str).str.strip().str.upper()
-    dsa=dsa_match.notna()&dsa_match.eq(tenant)
+    dsa_base=dsa_match.fillna("").to_numpy(dtype=str)
+    tenant_values=tenant.fillna("").to_numpy(dtype=str)
+    dsa_values=dsa_match.notna().to_numpy() & (dsa_base == tenant_values)
+    dsa=pd.Series(dsa_values,index=d.index)
     username_valid=phone|vehicle|dsa
     d["UserName Check"]=np.select([username.eq(""),username_valid],["N/A","Pass"],default="Wrong")
     d["DSA Excluded"]=dsa.fillna(False)
@@ -303,21 +307,31 @@ def build_engine() -> dict[str, Any]:
     d["Previous_OutletCode"] = pd.NA
     d["GapTime_Minutes"] = np.nan
 
-    eligible_for_sequence = d[
-        d["Calculation Population"] & d["DeliverDateTime"].notna() & d["PlanNumber"].notna()
-    ]
+    eligible_mask = (
+        d["Calculation Population"]
+        & d["DeliverDateTime"].notna()
+        & d["PlanNumber"].notna()
+    )
 
-    for _, idx in eligible_for_sequence.groupby("PlanNumber", sort=False).groups.items():
-        ordered = sorted(idx, key=lambda i: d.at[i, "DeliverDateTime"])
-        previous = None
-        for i in ordered:
-            if previous is not None:
-                prev_dt = d.at[previous, "DeliverDateTime"]
-                curr_dt = d.at[i, "DeliverDateTime"]
-                d.at[i, "Previous_DeliverDateTime"] = prev_dt
-                d.at[i, "Previous_OutletCode"] = d.at[previous, "OutletCode"]
-                d.at[i, "GapTime_Minutes"] = (curr_dt - prev_dt).total_seconds() / 60.0
-            previous = i
+    # Vectorized sequence calculation. Avoid cell-by-cell .at assignments,
+    # which can cause repeated full-column copies under pandas 3.x.
+    seq = d.loc[eligible_mask, ["PlanNumber", "DeliverDateTime", "OutletCode"]].copy()
+    seq["__row_id"] = seq.index
+    seq.sort_values(
+        ["PlanNumber", "DeliverDateTime", "__row_id"],
+        kind="mergesort",
+        inplace=True,
+    )
+    seq["__prev_dt"] = seq.groupby("PlanNumber", sort=False)["DeliverDateTime"].shift(1)
+    seq["__prev_outlet"] = seq.groupby("PlanNumber", sort=False)["OutletCode"].shift(1)
+    seq["__gap_min"] = (
+        seq["DeliverDateTime"] - seq["__prev_dt"]
+    ).dt.total_seconds() / 60.0
+
+    d.loc[seq.index, "Previous_DeliverDateTime"] = seq["__prev_dt"].to_numpy()
+    d.loc[seq.index, "Previous_OutletCode"] = seq["__prev_outlet"].to_numpy()
+    d.loc[seq.index, "GapTime_Minutes"] = seq["__gap_min"].to_numpy()
+    del seq
 
     distance = safe_num(d["distance_to_dropped"])
     gap = safe_num(d["GapTime_Minutes"])
