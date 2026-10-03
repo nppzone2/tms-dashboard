@@ -40,7 +40,7 @@ DATA_DIR = ROOT / "data"
 VALIDATION_DIR = ROOT / "validation"
 STAGE_DIR = ROOT / ".engine_stage"
 
-TMS_FILE = INPUT_DIR / "TMS Detail Order.xlsx"
+TMS_FILE = INPUT_DIR / "TMS Order Detail.xlsx"
 FILL_RATE_FILE = INPUT_DIR / "Fill Rate.xlsx"
 
 RULE_VERSION = "V2.0 Updated"
