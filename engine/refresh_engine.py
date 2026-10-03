@@ -172,7 +172,7 @@ def pct(numerator: float, denominator: float) -> float | None:
 # -----------------------------------------------------------------------------
 
 def build_engine() -> dict[str, Any]:
-    tms = normalize_source_excel(TMS_FILE, "TMS Detail Order")
+    tms = normalize_source_excel(TMS_FILE, "TMS Order Detail")
     fill = normalize_source_excel(FILL_RATE_FILE, "Fill Rate")
 
     tms_raw_count = len(tms)
@@ -184,7 +184,7 @@ def build_engine() -> dict[str, Any]:
         "distance_to_dropped", "username",
     ]
     fill_required = ["DocNo", "Sent_To_distributor"]
-    require_columns(tms, tms_required, "TMS Detail Order")
+    require_columns(tms, tms_required, "TMS Order Detail")
     require_columns(fill, fill_required, "Fill Rate")
 
     # Normalize key/date fields.
