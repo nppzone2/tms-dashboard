@@ -259,7 +259,6 @@ def build_engine() -> dict[str, Any]:
     username_valid = phone | vehicle | dsa
     d["UserName Check"] = np.select([username.eq(""), username_valid], ["N/A", "Pass"], default="Wrong")
     d["DSA Excluded"] = dsa.fillna(False)
-  
     # ------------------------------------------------------------------
     # Created Time
     # ------------------------------------------------------------------
